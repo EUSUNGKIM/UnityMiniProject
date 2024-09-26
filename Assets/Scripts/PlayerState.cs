@@ -22,19 +22,31 @@ public class PlayerState : IPlayerState
     {
         float moveInput = Input.GetAxis("Horizontal");
 
-        // 입력이 없을 때 애니메이션을 Idle로
-        if (moveInput != 0)
+        // 입력이 없을 때 애니메이션을 Idle로 (점프 중이 아닐 때만)
+        if (!player.IJumping())
         {
-            player.Move(moveInput); // 캐릭터 이동
-            player.animator.SetBool("Run", true); // 애니메이션을 Run 상태로 전환
+            if (moveInput != 0)
+            {
+                player.Move(moveInput); // 캐릭터 이동
+                player.animator.SetBool("Run", true); // Run 애니메이션 전환
+            }
+            else
+            {
+                player.animator.SetBool("Run", false); // Idle 상태로 전환
+            }
         }
         else
         {
-            player.animator.SetBool("Run", false); // 애니메이션을 false 상태로 전환(Idle로 전환)
+            // 점프 중에도 좌우 이동 가능하지만 Run 애니메이션은 끄고 Jump 애니메이션 유지
+            if (moveInput != 0)
+            {
+                player.Move(moveInput); // 공중에서 좌우 이동
+            }
+            player.animator.SetBool("Run", false); // 점프 중엔 Run 애니메이션 끄기
         }
 
-        // 점프 (Space 바)
-        if (Input.GetButtonDown("Jump") && player.IGrounded())
+        // 점프 (W키)
+        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded())
         {
             player.Jump(); // 점프 처리
         }

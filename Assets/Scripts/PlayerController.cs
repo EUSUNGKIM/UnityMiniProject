@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 5f; // 점프 힘
     private Rigidbody2D rigid; // 리지드바디
     private bool Grounded = true; // 캐릭터가 땅에 있는지 여부 확인
+    private bool iJumping = false;
 
     private void Start()
     {
@@ -22,7 +23,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        currentState?.Update(); // 현재 상태가 null이 아닐 때만 Update 호출
+        // 현재 상태가 null이 아닐 때만 Update 호출
+        if (currentState != null)
+        {
+            currentState.Update();
+        }
     }
 
     public void ChangeState(IPlayerState newState)
@@ -71,6 +76,7 @@ public class PlayerController : MonoBehaviour
         rigid.velocity = new Vector2(rigid.velocity.x, jumpForce);
         animator.SetBool("Jump", true); // 점프 애니메이션 시작
         Grounded = false; // 공중에 있음
+        iJumping = true; // 점프 중
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -79,6 +85,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             Grounded = true;
+            iJumping = false;
             animator.SetBool("Jump", false); // 점프 애니메이션 종료
         }
     }
@@ -86,5 +93,10 @@ public class PlayerController : MonoBehaviour
     public bool IGrounded()
     {
         return Grounded; // 캐릭터가 땅에 있는지 여부
+    }
+
+    public bool IJumping()
+    {
+        return iJumping; // 캐릭터가 점프 중인지 여부 반환
     }
 }
