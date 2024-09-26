@@ -17,14 +17,15 @@ public class PlayerState : IPlayerState
         player.animator.SetBool("Run", false); // Idle 상태로 초기화
         player.animator.SetBool("Jump", false);
         player.animator.SetBool("Roll", false);
+        player.animator.SetBool("Attack", false);
     }
 
     public void Update()
     {
         float moveInput = Input.GetAxis("Horizontal");
 
-        // 입력이 없을 때 애니메이션을 Idle로 (점프 중이 아닐 때만)
-        if (!player.IJumping() && !player.IRolling())
+        // 입력이 없을 때 애니메이션을 Idle로
+        if (!player.IJumping() && !player.IRolling() && !player.IAttacking())
         {
             if (moveInput != 0)
             {
@@ -47,15 +48,20 @@ public class PlayerState : IPlayerState
         }
 
         // 점프 (W키)
-        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded() && !player.IRolling())
+        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded() && !player.IRolling() && !player.IAttacking())
         {
             player.Jump(); // 점프 처리
         }
 
         // 구르기 (Shift키)
-        if (Input.GetKeyDown(KeyCode.LeftShift) && player.IGrounded())
+        if (Input.GetKeyDown(KeyCode.LeftShift) && player.IGrounded() && !player.IAttacking())
         {
             player.Roll(); // 구르기 처리
+        }
+        // 공격 (스페이스바)
+        if (Input.GetKeyDown(KeyCode.Space) && !player.IJumping() && !player.IRolling())
+        {
+            player.Attack(); // 공격 처리
         }
     }
 
