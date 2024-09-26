@@ -109,10 +109,18 @@ public class PlayerController : MonoBehaviour
     {
         if (!iAttacking) // 공격 중이 아닐 때만
         {
-            iMove = false;
-            iAttacking = true; // 공격 상태로 변경
-            animator.SetBool("Attack", true); // 공격 애니메이션 시작
             
+            iAttacking = true; // 공격 상태로 변경
+
+            if (iJumping)   // 점프상태
+            {
+                animator.SetBool("JumpAttack", true);   // 점프 공격 애니메이션 시작
+            }
+            else
+            {
+                iMove = false;  // 제자리 공격에선 움직일 수 없음
+                animator.SetBool("Attack", true); // 공격 애니메이션 시작
+            }
             // 공격 로직 추가 (예: 적에게 데미지 주기)
             StartCoroutine(EndAttack());
         }
@@ -122,6 +130,7 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.667f); // 애니메이션 시간에 맞춰 조정
         animator.SetBool("Attack", false); // 공격 애니메이션 종료
+        animator.SetBool("JumpAttack", false);
         iAttacking = false; // 공격 상태 해제
         iMove = true; // 이동 상태
     }

@@ -59,7 +59,7 @@ public class PlayerState : IPlayerState
             player.Roll(); // 구르기 처리
         }
         // 공격 (스페이스바)
-        if (Input.GetKeyDown(KeyCode.Space) && !player.IJumping() && !player.IRolling())
+        if (Input.GetKeyDown(KeyCode.Space) && !player.IRolling())
         {
             player.Attack(); // 공격 처리
         }
