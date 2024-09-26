@@ -11,9 +11,11 @@ public class PlayerController : MonoBehaviour
     private IPlayerState currentState; // 현재 상태
     private float lastMove = 0; // 마지막 이동 입력
     public float jumpForce = 5f; // 점프 힘
+    public float rollSpeed = 1f; // 구르기 속도
     private Rigidbody2D rigid; // 리지드바디
     private bool Grounded = true; // 캐릭터가 땅에 있는지 여부 확인
-    private bool iJumping = false;
+    private bool iJumping = false; // 점프 중인지 여부
+    private bool iRolling = false; // 구르기 중인지 여부
 
     private void Start()
     {
@@ -79,6 +81,22 @@ public class PlayerController : MonoBehaviour
         iJumping = true; // 점프 중
     }
 
+    public void Roll()
+    {
+        iRolling = true; // 구르기 상태
+        animator.SetBool("Roll", true); // 구르기 애니메이션 시작
+        float rollDirection = transform.localScale.x; // 현재 바라보는 방향으로 구르기
+        rigid.velocity = new Vector2(rollSpeed * rollDirection, rigid.velocity.y); // 구르기 속도 반영
+        // 구르기는 계속 땅에 닿아있어 따로 애니메이션 종료를 위한 코루틴이 필요(살짝 뛰우는 방법도 있지만 본인은 이게더편함)
+        StartCoroutine(EndRoll());
+    }
+    private IEnumerator EndRoll()
+    {
+        yield return new WaitForSeconds(1f); // 구르기 애니메이션 시간
+        iRolling = false; // 구르기 상태 해제
+        animator.SetBool("Roll", false); // 구르기 애니메이션 종료
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // 캐릭터가 땅에 닿으면 점프 상태 해제
@@ -90,6 +108,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     public bool IGrounded()
     {
         return Grounded; // 캐릭터가 땅에 있는지 여부
@@ -97,6 +116,10 @@ public class PlayerController : MonoBehaviour
 
     public bool IJumping()
     {
-        return iJumping; // 캐릭터가 점프 중인지 여부 반환
+        return iJumping; // 캐릭터가 점프 중인지 여부
+    }
+    public bool IRolling()
+    {
+        return iRolling; // 캐릭터가 구르기 중인지 여부
     }
 }

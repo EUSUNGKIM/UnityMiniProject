@@ -16,6 +16,7 @@ public class PlayerState : IPlayerState
     {
         player.animator.SetBool("Run", false); // Idle 상태로 초기화
         player.animator.SetBool("Jump", false);
+        player.animator.SetBool("Roll", false);
     }
 
     public void Update()
@@ -23,7 +24,7 @@ public class PlayerState : IPlayerState
         float moveInput = Input.GetAxis("Horizontal");
 
         // 입력이 없을 때 애니메이션을 Idle로 (점프 중이 아닐 때만)
-        if (!player.IJumping())
+        if (!player.IJumping() && !player.IRolling())
         {
             if (moveInput != 0)
             {
@@ -46,9 +47,15 @@ public class PlayerState : IPlayerState
         }
 
         // 점프 (W키)
-        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded())
+        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded() && !player.IRolling())
         {
             player.Jump(); // 점프 처리
+        }
+
+        // 구르기 (Shift키)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && player.IGrounded())
+        {
+            player.Roll(); // 구르기 처리
         }
     }
 
