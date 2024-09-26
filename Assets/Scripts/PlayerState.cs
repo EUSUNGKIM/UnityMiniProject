@@ -14,7 +14,8 @@ public class PlayerState : IPlayerState
 
     public void Enter()
     {
-        player.animator.SetBool("Run", false); // Idle 상태로 진입
+        player.animator.SetBool("Run", false); // Idle 상태로 초기화
+        player.animator.SetBool("Jump", false);
     }
 
     public void Update()
@@ -30,6 +31,12 @@ public class PlayerState : IPlayerState
         else
         {
             player.animator.SetBool("Run", false); // 애니메이션을 false 상태로 전환(Idle로 전환)
+        }
+
+        // 점프 (Space 바)
+        if (Input.GetButtonDown("Jump") && player.IGrounded())
+        {
+            player.Jump(); // 점프 처리
         }
     }
 
