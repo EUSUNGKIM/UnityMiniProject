@@ -47,8 +47,8 @@ public class PlayerState : IPlayerState
             player.animator.SetBool("Run", false); // 점프 중엔 Run 애니메이션 끄기
         }
 
-        // 점프 (W키)
-        if (Input.GetKeyDown(KeyCode.W) && player.IGrounded() && !player.IRolling() && !player.IAttacking())
+        // 점프 (스페이스바 키)
+        if (Input.GetKeyDown(KeyCode.Space) && player.IGrounded() && !player.IRolling() && !player.IAttacking())
         {
             player.Jump(); // 점프 처리
         }
@@ -59,7 +59,7 @@ public class PlayerState : IPlayerState
             player.Roll(); // 구르기 처리
         }
         // 공격 (스페이스바)
-        if (Input.GetKeyDown(KeyCode.Space) && !player.IRolling())
+        if (Input.GetMouseButtonDown(0) && !player.IRolling())
         {
             player.Attack(); // 공격 처리
         }
