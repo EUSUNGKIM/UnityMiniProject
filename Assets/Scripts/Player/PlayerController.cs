@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
     public Animator animator; // Animator 컴포넌트
     private IPlayerState playerState; // 현재 상태
     private float lastMove = 0; // 마지막 이동 입력
-    public float jumpForce = 5f; // 점프 힘
+    public float jumpForce = 4f; // 점프 힘
     public float rollSpeed = 1f; // 구르기 속도
     private Rigidbody2D rigid; // 리지드바디
     private bool Grounded = true; // 캐릭터가 땅에 있는지 여부 확인
@@ -14,11 +14,13 @@ public class PlayerController : MonoBehaviour
     private bool iJumping = false; // 점프 중인지 여부
     private bool iRolling = false; // 구르기 중인지 여부
     private bool iAttacking = false; // 공격 중인지 여부
+    public PlayerUI playerUI;  // UI
 
     private void Start()
     {
         rigid = GetComponent<Rigidbody2D>(); // Rigidbody2D 컴포넌트 가져오기
         ChangeState(new PlayerState(this)); // 초기 상태 설정
+        playerUI = FindObjectOfType<PlayerUI>();  // PlayerUI 찾기
     }
 
     private void Update()
@@ -140,7 +142,17 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("Jump", false); // 점프 애니메이션 종료
         }
     }
+    // 공격 받았을 때 체력 감소
+    public void DamageTake(int damage)
+    {
+        playerUI.TakeDamage(damage);
+    }
 
+    // 경험치 획득
+    public void GainExp(int exp)
+    {
+        playerUI.GainExp(exp);
+    }
 
     public bool IGrounded()
     {
