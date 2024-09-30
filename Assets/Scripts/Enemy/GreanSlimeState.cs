@@ -23,6 +23,11 @@ public class GreanSlimeState : ISlimeState
         // 슬라임과 플레이어 사이의 거리
         float PlayerDistance = Vector3.Distance(slimeController.transform.position, player.position);
 
+        // 플레이어가 죽었는지 체크
+        if (player.CompareTag("Die"))
+        {
+            return;
+        }
         // 플레이어와의 거리 체크
         if (PlayerDistance > attackRange)
         {

@@ -2607,9 +2607,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a05eeaadbaef5c46a7c99a7714d1c2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthBar: {fileID: 745592866}
-  experienceBar: {fileID: 1021553011}
+  HpBar: {fileID: 745592866}
+  expBar: {fileID: 1021553011}
   statusText: {fileID: 1930148957}
+  maxHp: 100
+  PresentHp: 0
 --- !u!114 &476843340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3572,6 +3574,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76d0a76570b2b9d42b83b98a4fb4b019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iKnockedBack: 0
+  knockBackForce: 5
+  knockBackDuration: 0.5
   animator: {fileID: 1729466380}
   jumpForce: 4
   rollSpeed: 1
@@ -3832,7 +3837,7 @@ GameObject:
   - component: {fileID: 2093960056}
   m_Layer: 6
   m_Name: GreanSlime
-  m_TagString: Untagged
+  m_TagString: Slime
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3984,5 +3989,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e4486b9d89ea6d4e95dc14efa9683de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 2093960053}
   moveSpeed: 2
+  attackDamage: 20

@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool iKnockedBack = false; // 넉백 중인지 여부
+    public float knockBackForce = 5f; // 넉백 힘
+    public float knockBackDuration = 0.5f; // 넉백 지속 시간
+
     public Animator animator; // Animator 컴포넌트
     private IPlayerState playerState; // 현재 상태
     private float lastMove = 0; // 마지막 이동 입력
@@ -14,11 +18,15 @@ public class PlayerController : MonoBehaviour
     private bool iJumping = false; // 점프 중인지 여부
     private bool iRolling = false; // 구르기 중인지 여부
     private bool iAttacking = false; // 공격 중인지 여부
+    private bool iHit = false; // 넉백 중인지 여부
+    private bool idead = false; // 플레이어가 죽었는지 여부
     public PlayerUI playerUI;  // UI
+    private Collider2D playerCollider;
 
     private void Start()
     {
         rigid = GetComponent<Rigidbody2D>(); // Rigidbody2D 컴포넌트 가져오기
+        playerCollider = GetComponent<Collider2D>(); // Collider2D 컴포넌트 가져오기
         ChangeState(new PlayerState(this)); // 초기 상태 설정
         playerUI = FindObjectOfType<PlayerUI>();  // PlayerUI 찾기
     }
@@ -90,9 +98,11 @@ public class PlayerController : MonoBehaviour
         {
             iRolling = true; // 구르기 상태
             animator.SetBool("Roll", true); // 구르기 애니메이션 시작
+            gameObject.layer = LayerMask.NameToLayer("Ignore");
             float rollDirection = transform.localScale.x; // 현재 바라보는 방향으로 구르기
             rigid.velocity = new Vector2(rollSpeed * rollDirection, rigid.velocity.y); // 구르기 속도 반영
             // 구르기는 계속 땅에 닿아있어 따로 애니메이션 종료를 위한 코루틴이 필요(살짝 뛰우는 방법도 있지만 본인은 이게더편함)
+            
             StartCoroutine(EndRoll());
         }
     }
@@ -101,6 +111,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(1f); // 구르기 애니메이션 시간
         iRolling = false; // 구르기 상태 해제
         animator.SetBool("Roll", false); // 구르기 애니메이션 종료
+        gameObject.layer = LayerMask.NameToLayer("Player");
     }
 
     public void Attack()
@@ -119,10 +130,11 @@ public class PlayerController : MonoBehaviour
                 iMove = false;  // 제자리 공격에선 움직일 수 없음
                 animator.SetBool("Attack", true); // 공격 애니메이션 시작
             }
-            // 공격 로직 추가 (예: 적에게 데미지 주기)
+
             StartCoroutine(EndAttack());
         }
     }
+    
 
     private IEnumerator EndAttack()
     {
@@ -132,6 +144,7 @@ public class PlayerController : MonoBehaviour
         iAttacking = false; // 공격 상태 해제
         iMove = true; // 이동 상태
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // 캐릭터가 땅에 닿으면 점프 상태 해제
@@ -142,10 +155,65 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("Jump", false); // 점프 애니메이션 종료
         }
     }
-    // 공격 받았을 때 체력 감소
-    public void DamageTake(int damage)
+
+    // 피격 처리 메서드
+    public void TakeDamage(int damage)
     {
-        playerUI.TakeDamage(damage);
+        // 구르기 중에는 데미지를 받지 않음
+        if (!iRolling)
+        {
+            // 데미지
+            playerUI.TakeDamage(damage);
+
+            // 체력이 0이 되었을 때
+            if (playerUI.PresentHp <= 0)
+            {
+                Die();
+            }
+
+            // 넉백 처리
+            if (!iKnockedBack) // 넉백 중이 아닐 때만
+            {
+                StartCoroutine(KnockBack());
+            }
+        }
+
+    }
+    public IEnumerator KnockBack()
+    {
+        iKnockedBack = true; // 넉백 상태 설정
+        animator.SetBool("Hit", true); // 피격 애니메이션 시작
+
+        // 캐릭터의 방향에 따라 넉백 방향
+        Vector2 knockBackDirection;
+
+        if (transform.localScale.x > 0)
+        {
+            knockBackDirection = Vector2.left; // 왼쪽으로 넉백
+        }
+        else
+        {
+            knockBackDirection = Vector2.right; // 오른쪽으로 넉백
+        }
+        rigid.velocity = knockBackDirection * knockBackForce;
+
+        yield return new WaitForSeconds(knockBackDuration); // 넉백 지속 시간 대기
+
+        iKnockedBack = false; // 넉백 상태 해제
+        animator.SetBool("Hit", false); // 피격 애니메이션 종료
+    }
+    public void Die()
+    {
+        animator.SetBool("Die", true); // die 애니메이션 실행
+        StartCoroutine(EndGame());
+        gameObject.tag = "Die";
+        idead = true;// die true
+    }
+
+    private IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(3.0f); // 1초 대기
+        Application.Quit(); // 게임 종료
     }
 
     // 경험치 획득
@@ -170,5 +238,9 @@ public class PlayerController : MonoBehaviour
     public bool IAttacking()
     {
         return iAttacking; // 캐릭터가 공격 중인지 여부
+    }
+    public bool IDead ()
+    {
+        return idead; // 캐릭터가 죽었는지 여부
     }
 }

@@ -19,6 +19,12 @@ public class PlayerState : IPlayerState
 
     public void Update()
     {
+        // 플레이어가 죽었을 때
+        if (player.IDead())
+        {
+            return;
+        }
+
         float moveInput = Input.GetAxis("Horizontal");
 
         // 입력이 없을 때 애니메이션을 Idle로
