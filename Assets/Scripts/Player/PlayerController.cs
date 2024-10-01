@@ -174,6 +174,10 @@ public class PlayerController : MonoBehaviour
             // 넉백 처리
             if (!iKnockedBack) // 넉백 중이 아닐 때만
             {
+                // 넉백 상태 전에 다른 애니메이션 끔
+                animator.SetBool("Run", false);
+                animator.SetBool("Jump", false);
+
                 StartCoroutine(KnockBack());
             }
         }
@@ -242,5 +246,9 @@ public class PlayerController : MonoBehaviour
     public bool IDead ()
     {
         return idead; // 캐릭터가 죽었는지 여부
+    }
+    public bool IKnockedBack()
+    {
+        return iKnockedBack;
     }
 }

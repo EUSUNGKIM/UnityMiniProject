@@ -19,8 +19,8 @@ public class PlayerState : IPlayerState
 
     public void Update()
     {
-        // 플레이어가 죽었을 때
-        if (player.IDead())
+        // 플레이어가 죽었을 및 넉백상태일때 행동불가
+        if (player.IDead() || player.IKnockedBack())
         {
             return;
         }
