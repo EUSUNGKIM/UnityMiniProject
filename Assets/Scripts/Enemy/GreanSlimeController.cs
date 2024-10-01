@@ -3,16 +3,20 @@ using UnityEngine;
 
 public class GreanSlimeController : MonoBehaviour
 {
-    public Animator animator; // 애니메이터 컴포넌트
+    public Animator animator;
     private ISlimeState currentState; // 현재 상태
     public float moveSpeed = 2f; // 슬라임 이동 속도
     private bool iAttack = false;   // 공격 중인지 여부
+    private bool iHit = false;  // 피격 중인지 여부
     public int attackDamage = 10; // 슬라임 공격력
+    public int maxHp = 50; // 슬라임 최대 체력
+    private int presentHp; // 슬라임 현재 체력
     private PlayerController player;
 
     private void Start()
     {
         animator = GetComponent<Animator>(); // 애니메이터 컴포넌트 가져오기
+        presentHp = maxHp; // 슬라임 체력 초기화
         ChangeState(new GreanSlimeState(this)); // 초기 상태 설정
         player = FindObjectOfType<PlayerController>();
     }
@@ -38,14 +42,17 @@ public class GreanSlimeController : MonoBehaviour
 
     public void MoveAi(Vector3 playerPosition)
     {
-        Vector3 direction = (playerPosition - transform.position).normalized;
-        Move(direction.x); // 슬라임을 플레이어 쪽으로 이동
+        if (!iHit)  // 피격 중일 때 이동하지 않음
+        {
+            Vector3 direction = (playerPosition - transform.position).normalized;
+            Move(direction.x);
+        }
     }
 
     public void Move(float moveInput)
     {
         // 이동 처리
-        if (!iAttack) // 공격 중일 때와 넉백 중일 때는 이동 false
+        if (!iAttack && !iHit) // 공격 중일 때와 피격 중일 때는 이동 false
         {
             Vector2 move = new Vector2(moveInput, 0);
             transform.Translate(move * Time.deltaTime * moveSpeed); // 이동
@@ -75,7 +82,7 @@ public class GreanSlimeController : MonoBehaviour
     }
     private IEnumerator DealDamageAfterDelay()
     {
-        yield return new WaitForSeconds(0.5f); // 애니메이션과 맞춰 조정
+        yield return new WaitForSeconds(0.5f); // 애니메이션과 타이밍 맞추기
         if (player != null && Vector3.Distance(transform.position, player.transform.position) <= 1f)
         {
             player.TakeDamage(attackDamage); // 플레이어에게 데미지 주기
@@ -97,7 +104,45 @@ public class GreanSlimeController : MonoBehaviour
             
         }
     }
+    // 피격 처리
+    public void TakeDamage(int damage)
+    {
+        if (!iHit)
+        {
+            presentHp -= damage; // 체력 감소
 
+            if (iAttack)
+            {
+                iAttack = false; // 공격 상태 해제
+                animator.SetBool("Attack", false); // 공격 애니메이션 종료
+            }
+            if (presentHp <= 0)
+            {
+                Die(); // 체력이 0 이하가 되면 죽음 처리
+            }
+            else
+            {
+                animator.SetBool("Attack", false);
+                StartCoroutine(HitAction()); // 피격 애니메이션 및 처리
+            }
+        }
+    }
+
+    private IEnumerator HitAction()
+    {
+        iHit = true; // 피격 상태
+        animator.SetBool("Hit", true); // 피격 애니메이션 실행
+
+        yield return new WaitForSeconds(0.684f); // 피격 애니메이션 시간 조정
+        animator.SetBool("Hit", false); // 피격 애니메이션 종료
+        iHit = false; // 피격 상태 해제
+    }
+
+    private void Die()
+    {
+        animator.SetBool("Die", true); // Die 애니메이션 실행
+        Destroy(gameObject, 1.6f); // 애니메이션 끝나고 오브젝트 삭제
+    }
     public bool IAttack()
     {
         return iAttack;

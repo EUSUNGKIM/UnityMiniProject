@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public int attackDamage = 20; // 공격력
+    public float attackRange = 1f; // 공격 범위 설정
+
     public bool iKnockedBack = false; // 넉백 중인지 여부
     public float knockBackForce = 5f; // 넉백 힘
     public float knockBackDuration = 0.5f; // 넉백 지속 시간
@@ -132,6 +135,7 @@ public class PlayerController : MonoBehaviour
             }
 
             StartCoroutine(EndAttack());
+            StartCoroutine(DealDamageAfterDelay());
         }
     }
     
@@ -144,7 +148,20 @@ public class PlayerController : MonoBehaviour
         iAttacking = false; // 공격 상태 해제
         iMove = true; // 이동 상태
     }
+    private IEnumerator DealDamageAfterDelay()
+    {
+        yield return new WaitForSeconds(0.267f); // 공격이 적중하는 맞춰 딜레이 조정
 
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange);
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            GreanSlimeController slime = enemy.GetComponent<GreanSlimeController>();
+            if (slime != null)
+            {
+                slime.TakeDamage(attackDamage); // 슬라임에게 데미지 주기
+            }
+        }
+    }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // 캐릭터가 땅에 닿으면 점프 상태 해제
@@ -165,7 +182,7 @@ public class PlayerController : MonoBehaviour
             // 데미지
             playerUI.TakeDamage(damage);
 
-            // 체력이 0이 되었을 때
+            // 사망
             if (playerUI.PresentHp <= 0)
             {
                 Die();

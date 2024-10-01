@@ -3574,6 +3574,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76d0a76570b2b9d42b83b98a4fb4b019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackDamage: 20
+  attackRange: 1
   iKnockedBack: 0
   knockBackForce: 5
   knockBackDuration: 0.5
@@ -3992,3 +3994,4 @@ MonoBehaviour:
   animator: {fileID: 2093960053}
   moveSpeed: 2
   attackDamage: 20
+  maxHp: 50

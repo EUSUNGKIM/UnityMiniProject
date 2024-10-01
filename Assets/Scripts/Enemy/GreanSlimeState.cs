@@ -28,6 +28,7 @@ public class GreanSlimeState : ISlimeState
         {
             return;
         }
+
         // 플레이어와의 거리 체크
         if (PlayerDistance > attackRange)
         {
