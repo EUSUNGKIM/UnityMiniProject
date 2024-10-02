@@ -246,31 +246,23 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log(playerUI.PresentExp);
         playerUI.GainExp(exp);
-        CheckLevelUp();
     }
-    private void CheckLevelUp()
-    {
-        // 현재 경험치가 최대 경험치 이상일 때 레벨업
-        while (playerUI.PresentExp >= playerUI.maxExp)
-        {
-            Debug.Log("Level up!");
-            LevelUp(); // 레벨업 메서드 호출
-        }
-    }
-    private void LevelUp()
-    {
-        levelup++; // 레벨 증가
-        playerUI.PresentExp -= playerUI.maxExp; // 경험치 초기화
-
-        playerUI.UpdateStats(levelup, attackDamage, defense, gold); // UI 업데이트
-    }
+    
     // GOLD 획득
     public void GetGold(int amount)
     {
         gold += amount; // 골드 증가
-        playerUI.UpdateStats(levelup, attackDamage, defense, gold);
+        /*playerUI.UpdateStats(levelup, attackDamage, defense, gold);*/
     }
-    
+    public void UpdatePlayerStats(int levelup, int attack, int defense, int goldAmount)
+    {
+        levelup = playerUI.level;
+        attackDamage = playerUI.attackPower;
+        defense = playerUI.defensePower;
+        gold = playerUI.gold;
+
+        playerUI.UpdateStats(levelup, attackDamage, defense, gold); // UI 업데이트
+    }
     public bool IGrounded()
     {
         return Grounded; // 캐릭터가 땅에 있는지 여부

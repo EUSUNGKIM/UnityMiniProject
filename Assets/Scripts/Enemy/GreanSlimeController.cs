@@ -141,6 +141,7 @@ public class GreanSlimeController : MonoBehaviour
 
     private void Die()
     {
+        gameObject.layer = LayerMask.NameToLayer("Ignore");
         animator.SetBool("Die", true); // Die 애니메이션 실행
         DropExp(); // 경험치
         Destroy(gameObject, 1.6f); // 애니메이션 끝나고 오브젝트 삭제

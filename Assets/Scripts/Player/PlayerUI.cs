@@ -16,9 +16,9 @@ public class PlayerUI : MonoBehaviour
     public int PresentExp;           // 현재 경험치
 
     public int level;
-    private int attackPower;                 // 공격력
-    private int defensePower;                // 방어력
-    private int gold;                        // 골드
+    public int attackPower;                 // 공격력
+    public int defensePower;                // 방어력
+    public int gold;                        // 골드
 
     private void Start()
     {
@@ -41,23 +41,15 @@ public class PlayerUI : MonoBehaviour
     public void GainExp(int experience)
     {
         PresentExp += experience; // 경험치 추가
-        PresentExp = Mathf.Clamp(PresentExp, 0, maxExp); // 최대 경험치 클램프
-
         // 레벨업 체크
-        CheckLevelUp(); // 레벨업 체크 호출
-
-        // 경험치바 슬라이더 값
+        if (PresentExp >= maxExp)
+        {
+            LevelUp();
+            PresentExp -= maxExp;
+        }
         expBar.value = PresentExp;
     }
-    private void CheckLevelUp()
-    {
-        // 현재 경험치가 최대 경험치 이상일 때 레벨업
-        while (PresentExp >= maxExp)
-        {
-            Debug.Log("Level up!");
-            LevelUp(); // 레벨업 메서드 호출
-        }
-    }
+    
     private void LevelUp()
     {
         level++; // 레벨 증가
@@ -68,7 +60,7 @@ public class PlayerUI : MonoBehaviour
 
         // 최대 체력 증가
         maxHp += 10;
-        PresentHp = Mathf.Clamp(PresentHp, 0, maxHp);
+        PresentHp = maxHp;
         UpdateStats(level, attackPower, defensePower, gold);
     }
     public void UpdateStats(int levelup ,int attack, int defense, int goldAmount)
