@@ -12,9 +12,10 @@ public class PlayerUI : MonoBehaviour
 
     public int maxHp = 100;            // 최대 체력
     public int PresentHp;               // 현재 체력
-    private int maxExp = 100;        // 최대 경험치
-    private int PresentExp;           // 현재 경험치
+    public int maxExp = 100;        // 최대 경험치
+    public int PresentExp;           // 현재 경험치
 
+    public int level;
     private int attackPower;                 // 공격력
     private int defensePower;                // 방어력
     private int gold;                        // 골드
@@ -23,7 +24,9 @@ public class PlayerUI : MonoBehaviour
     {
         PresentHp = maxHp;         // 현재 체력을 최대 체력으로 초기화
         PresentExp = 0;              // 경험치를 0으로 초기화
+        level = 1;
 
+        expBar.value = 0;
         UpdateUI();
     }
 
@@ -37,18 +40,43 @@ public class PlayerUI : MonoBehaviour
 
     public void GainExp(int experience)
     {
-        // 현재 경험치
-        PresentExp = Mathf.Clamp(PresentExp + experience, 0, maxExp);
+        PresentExp += experience; // 경험치 추가
+        PresentExp = Mathf.Clamp(PresentExp, 0, maxExp); // 최대 경험치 클램프
+
+        // 레벨업 체크
+        CheckLevelUp(); // 레벨업 체크 호출
 
         // 경험치바 슬라이더 값
-        expBar.value = (float)PresentExp / maxExp;
+        expBar.value = PresentExp;
     }
-
-    public void UpdateStats(int attack, int defense, int goldAmount)
+    private void CheckLevelUp()
     {
-        // 공격력, 방어력, 골드 값
+        // 현재 경험치가 최대 경험치 이상일 때 레벨업
+        while (PresentExp >= maxExp)
+        {
+            Debug.Log("Level up!");
+            LevelUp(); // 레벨업 메서드 호출
+        }
+    }
+    private void LevelUp()
+    {
+        level++; // 레벨 증가
+
+        // 레벨업 시 공격력 및 방어력 증가
+        attackPower += 5;
+        defensePower += 2;
+
+        // 최대 체력 증가
+        maxHp += 10;
+        PresentHp = Mathf.Clamp(PresentHp, 0, maxHp);
+        UpdateStats(level, attackPower, defensePower, gold);
+    }
+    public void UpdateStats(int levelup ,int attack, int defense, int goldAmount)
+    {
+        // 레벨, 공격력, 방어력, 골드 값
+        level = levelup;
         attackPower = attack;
-        this.defensePower = defense;
+        defensePower = defense;
         gold = goldAmount;
 
         UpdateUI();
@@ -56,6 +84,6 @@ public class PlayerUI : MonoBehaviour
 
     private void UpdateUI()
     {
-        statusText.text = $"공격력: {attackPower:000}\n방어력: {defensePower:000}\nGOLD: {gold:000}";
+        statusText.text = ($"레벨 : {level:000}\n공격력 : {attackPower:000}\n방어력 : {defensePower:000}\nGOLD : {gold:000}");
     }
 }

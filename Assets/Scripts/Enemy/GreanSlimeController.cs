@@ -9,6 +9,7 @@ public class GreanSlimeController : MonoBehaviour
     private bool iAttack = false;   // 공격 중인지 여부
     private bool iHit = false;  // 피격 중인지 여부
     public int attackDamage = 10; // 슬라임 공격력
+    public int gold = 10; // 드랍 골드 양
     public int maxHp = 50; // 슬라임 최대 체력
     private int presentHp; // 슬라임 현재 체력
     private PlayerController player;
@@ -141,7 +142,27 @@ public class GreanSlimeController : MonoBehaviour
     private void Die()
     {
         animator.SetBool("Die", true); // Die 애니메이션 실행
+        DropExp(); // 경험치
         Destroy(gameObject, 1.6f); // 애니메이션 끝나고 오브젝트 삭제
+        DropGold();
+    }
+    private void DropGold()
+    {
+        // 플레이어에게 골드를 추가하는 메서드 호출
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            player.GetGold(gold);
+        }
+    }
+    private void DropExp()
+    {
+        // 플레이어에게 경험치를 추가하는 메서드 호출
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            player.GainExp(60); // 슬라임을 처치했을 때 경험치 60 증가
+        }
     }
     public bool IAttack()
     {

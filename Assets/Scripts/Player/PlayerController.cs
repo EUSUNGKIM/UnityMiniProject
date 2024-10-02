@@ -3,7 +3,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public int levelup = 1;
     public int attackDamage = 20; // 공격력
+    private int defense = 10; // 방어력
+    private int gold = 50; // 골드
+
     public float attackRange = 1f; // 공격 범위 설정
 
     public bool iKnockedBack = false; // 넉백 중인지 여부
@@ -21,7 +25,6 @@ public class PlayerController : MonoBehaviour
     private bool iJumping = false; // 점프 중인지 여부
     private bool iRolling = false; // 구르기 중인지 여부
     private bool iAttacking = false; // 공격 중인지 여부
-    private bool iHit = false; // 넉백 중인지 여부
     private bool idead = false; // 플레이어가 죽었는지 여부
     public PlayerUI playerUI;  // UI
     private Collider2D playerCollider;
@@ -32,6 +35,7 @@ public class PlayerController : MonoBehaviour
         playerCollider = GetComponent<Collider2D>(); // Collider2D 컴포넌트 가져오기
         ChangeState(new PlayerState(this)); // 초기 상태 설정
         playerUI = FindObjectOfType<PlayerUI>();  // PlayerUI 찾기
+        playerUI.UpdateStats(levelup, attackDamage, defense, gold);
     }
 
     private void Update()
@@ -180,7 +184,7 @@ public class PlayerController : MonoBehaviour
         if (!iRolling)
         {
             // 데미지
-            playerUI.TakeDamage(damage);
+            playerUI.TakeDamage(damage - defense);
 
             // 사망
             if (playerUI.PresentHp <= 0)
@@ -240,9 +244,33 @@ public class PlayerController : MonoBehaviour
     // 경험치 획득
     public void GainExp(int exp)
     {
+        Debug.Log(playerUI.PresentExp);
         playerUI.GainExp(exp);
+        CheckLevelUp();
     }
+    private void CheckLevelUp()
+    {
+        // 현재 경험치가 최대 경험치 이상일 때 레벨업
+        while (playerUI.PresentExp >= playerUI.maxExp)
+        {
+            Debug.Log("Level up!");
+            LevelUp(); // 레벨업 메서드 호출
+        }
+    }
+    private void LevelUp()
+    {
+        levelup++; // 레벨 증가
+        playerUI.PresentExp -= playerUI.maxExp; // 경험치 초기화
 
+        playerUI.UpdateStats(levelup, attackDamage, defense, gold); // UI 업데이트
+    }
+    // GOLD 획득
+    public void GetGold(int amount)
+    {
+        gold += amount; // 골드 증가
+        playerUI.UpdateStats(levelup, attackDamage, defense, gold);
+    }
+    
     public bool IGrounded()
     {
         return Grounded; // 캐릭터가 땅에 있는지 여부
@@ -264,7 +292,7 @@ public class PlayerController : MonoBehaviour
     {
         return idead; // 캐릭터가 죽었는지 여부
     }
-    public bool IKnockedBack()
+    public bool IKnockedBack() // 넉백 여부
     {
         return iKnockedBack;
     }

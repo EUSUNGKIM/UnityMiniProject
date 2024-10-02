@@ -3,7 +3,6 @@ using UnityEngine;
 public class PlayerState : IPlayerState
 {
     private PlayerController player; // PlayerController
-
     public PlayerState(PlayerController player)
     {
         this.player = player; // PlayerController 초기화
@@ -67,7 +66,6 @@ public class PlayerState : IPlayerState
             player.Attack(); // 공격 처리
         }
     }
-
     public void Exit()
     { }
 }
